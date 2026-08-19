@@ -10,6 +10,7 @@ import HowItWorks from './components/HowItWorks';
 import ForFarmers from './components/ForFarmers';
 import ForShopkeepers from './components/ForShopkeepers';
 import About from './components/About';
+import Registration from './pages/Registration';
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           <Route path='/for-farmers' element={<ForFarmers/>}/>
           <Route path='/for-shopkeepers' element={<ForShopkeepers/>}/>
           <Route path='/about' element={<About/>}/>
+          <Route path='/register' element={<Registration/>}/>
         </>
       )
     }

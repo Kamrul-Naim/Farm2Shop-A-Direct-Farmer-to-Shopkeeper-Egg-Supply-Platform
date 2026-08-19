@@ -5,7 +5,7 @@ import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 
 const Navbar = () => {
-  const { roleState } = useContext(AppContext);
+  const { roleState,logoutUser } = useContext(AppContext);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -183,8 +183,12 @@ const Navbar = () => {
                       </button>
 
                       <button
-                        onClick={() => {
-                          // Logout will be implemented later
+                        onClick={async () => {
+                          const success = await logoutUser();
+
+                          if (success) {
+                            navigate("/");
+                          }
                         }}
                         className="w-full text-left px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
                       >
@@ -304,9 +308,13 @@ const Navbar = () => {
                   </button>
 
                   <button
-                    onClick={() => {
-                      // Logout will be implemented later
-                      closeMenu();
+                    onClick={async () => {
+                      const success = await logoutUser();
+
+                      if (success) {
+                        closeMenu();
+                        navigate("/");
+                      }
                     }}
                     className="w-full text-left px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
                   >

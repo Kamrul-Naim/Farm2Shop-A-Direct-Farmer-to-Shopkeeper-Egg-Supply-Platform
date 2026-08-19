@@ -4,8 +4,9 @@ import 'dotenv/config'
 import connectDB from "./config/mongodb.js"
 import farmerRouter from "./routes/farmerRoutes.js"
 import shopkeeperRouter from "./routes/shopkeeperRoutes.js"
-// import adminRouter from "./routes/adminRoute.js"
+import authRouter from "./routes/authRoutes.js"
 import connectCloudinary from "./config/cloudinary.js"
+import cookieParser from "cookie-parser"
 
 // app config
 const app = express()
@@ -15,23 +16,17 @@ connectCloudinary()
 
 // middlewares
 app.use(express.json())
-// app.use(cors({
-//     origin: [
-//         'http://localhost:5173',
-//         'http://localhost:5174',
-//         'https://pulse-care-medical-appointment-mana.vercel.app',
-//         'https://pulse-care-medical-appointment-mana-pi.vercel.app'
-//     ],
-//     credentials: true
-// }))
-
-app.use(cors())
+app.use(cookieParser())
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 
 
 // api endpoints
 app.use("/api/farmers", farmerRouter);
 app.use("/api/shopkeepers", shopkeeperRouter);
-// app.use("/api/doctor", doctorRouter)
+app.use("/api/auth", authRouter);
 
 app.get("/", (req, res) => {
   res.send("API Working")
