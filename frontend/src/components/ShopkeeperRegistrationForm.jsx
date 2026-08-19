@@ -4,7 +4,7 @@ import { AppContext } from "../context/AppContext";
 
 const ShopkeeperRegistrationForm = () => {
 
-  const { registerShopkeeper } = useContext(AppContext);
+  const { registerShopkeeper,setRole } = useContext(AppContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -70,9 +70,10 @@ const ShopkeeperRegistrationForm = () => {
       const result = await registerShopkeeper(data);
 
 
-      if (result.success) {
-        navigate("/login");
-      }
+    if (result.success) {
+      setRole("shopkeeper");
+      navigate("/login");
+    }
 
     } finally {
 

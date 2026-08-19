@@ -5,7 +5,7 @@ import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 
 const Navbar = () => {
-  const { roleState,logoutUser } = useContext(AppContext);
+  const { roleState,logoutUser,user,userRole } = useContext(AppContext);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -54,11 +54,11 @@ const Navbar = () => {
 
   let links = guestLinks;
 
-  if (roleState === "farmer") {
+  if (userRole === "farmer") {
     links = farmerLinks;
   }
 
-  if (roleState === "shopkeeper") {
+  if (userRole === "shopkeeper") {
     links = shopkeeperLinks;
   }
 
@@ -111,7 +111,7 @@ const Navbar = () => {
           {/* Desktop Right Section */}
           <div className="hidden lg:flex items-center gap-4">
             {/* Guest */}
-            {roleState === "" && (
+            {!user && (
               <>
                 <button
                   onClick={() => navigate("/login")}
@@ -130,7 +130,7 @@ const Navbar = () => {
             )}
 
             {/* Logged in */}
-            {roleState !== "" && (
+            {user && (
               <>
                 {/* Notifications */}
                 <button className="relative p-2 text-gray-600 hover:text-[#176B3A] transition-colors">
@@ -158,13 +158,13 @@ const Navbar = () => {
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                     <div className="p-3 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-800">
-                        {roleState === "farmer"
+                        {userRole === "farmer"
                           ? "Farmer Account"
                           : "Shopkeeper Account"}
                       </p>
 
                       <p className="text-xs text-gray-500 capitalize mt-0.5">
-                        {roleState}
+                        {userRole}
                       </p>
                     </div>
 
@@ -172,7 +172,7 @@ const Navbar = () => {
                       <button
                         onClick={() =>
                           navigate(
-                            roleState === "farmer"
+                            userRole === "farmer"
                               ? "/farmer/profile"
                               : "/shopkeeper/profile",
                           )
@@ -236,7 +236,7 @@ const Navbar = () => {
             ))}
 
             {/* Guest Mobile Buttons */}
-            {roleState === "" && (
+            {!user && (
               <div className="flex gap-3 pt-3 mt-2 border-t border-gray-100">
                 <button
                   onClick={() => {
@@ -261,7 +261,7 @@ const Navbar = () => {
             )}
 
             {/* Logged-in Mobile */}
-            {roleState !== "" && (
+            {user && (
               <div className="mt-3 pt-3 border-t border-gray-100">
                 {/* User Information */}
                 <div className="flex items-center gap-3 px-3 py-2">
@@ -273,13 +273,13 @@ const Navbar = () => {
 
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
-                      {roleState === "farmer"
+                      {userRole === "farmer"
                         ? "Farmer Account"
                         : "Shopkeeper Account"}
                     </p>
 
                     <p className="text-xs text-gray-500 capitalize">
-                      {roleState}
+                      {userRole}
                     </p>
                   </div>
 
@@ -296,7 +296,7 @@ const Navbar = () => {
                   <button
                     onClick={() => {
                       navigate(
-                        roleState === "farmer"
+                        userRole === "farmer"
                           ? "/farmer/profile"
                           : "/shopkeeper/profile",
                       );

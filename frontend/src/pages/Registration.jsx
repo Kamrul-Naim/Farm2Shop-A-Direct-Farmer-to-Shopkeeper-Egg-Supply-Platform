@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import FarmerRegistrationForm from "../components/FarmerRegistrationForm";
 import ShopkeeperRegistrationForm from "../components/ShopkeeperRegistrationForm";
+import { AppContext } from "../context/AppContext";
 
 const Registration = () => {
 
-  const [role, setRole] = useState("farmer");
+  const {role,setRole}=useContext(AppContext)
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12">

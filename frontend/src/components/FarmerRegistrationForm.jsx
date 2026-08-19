@@ -4,7 +4,7 @@ import { AppContext } from "../context/AppContext";
 
 const FarmerRegistrationForm = () => {
 
-  const { registerFarmer } = useContext(AppContext);
+  const { registerFarmer,setRole } = useContext(AppContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -70,9 +70,10 @@ const FarmerRegistrationForm = () => {
       const result = await registerFarmer(data);
 
 
-      if (result.success) {
-        navigate("/login");
-      }
+    if (result.success) {
+      setRole("farmer");
+      navigate("/login");
+    }
 
     } finally {
 

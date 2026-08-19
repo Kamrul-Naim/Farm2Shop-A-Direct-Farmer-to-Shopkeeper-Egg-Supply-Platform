@@ -11,21 +11,21 @@ import ForFarmers from './components/ForFarmers';
 import ForShopkeepers from './components/ForShopkeepers';
 import About from './components/About';
 import Registration from './pages/Registration';
+import Login from './pages/Login';
 
 
 const App = () => {
 
-  const {roleState}=useContext(AppContext)
+  const {roleState,userRole,user}=useContext(AppContext)
 
   function roles(){
-    if(roleState===''){
+    if(!user){
       return(
         <>
           <Route path='/how-it-works' element={<HowItWorks/>}/>
           <Route path='/for-farmers' element={<ForFarmers/>}/>
           <Route path='/for-shopkeepers' element={<ForShopkeepers/>}/>
           <Route path='/about' element={<About/>}/>
-          <Route path='/register' element={<Registration/>}/>
         </>
       )
     }
@@ -41,6 +41,8 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Home/>}/>
         {roles()}
+        <Route path='/register' element={<Registration/>}/>
+        <Route path='/login' element={<Login/>}/>
       </Routes>
     </div>
     <Footer/>
