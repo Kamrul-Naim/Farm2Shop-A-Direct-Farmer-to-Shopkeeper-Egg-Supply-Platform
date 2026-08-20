@@ -196,19 +196,21 @@ const loginFarmer = async (req, res) => {
 
         // Response
 
-        return res.status(200).json({
-            success: true,
-            message: "Farmer login successful.",
-            farmer: {
-                id: farmer._id,
-                name: farmer.name,
-                email: farmer.email,
-                phone: farmer.phone,
-                profileImage: farmer.profileImage,
-                farmName: farmer.farmName,
-                verificationStatus: farmer.verificationStatus
-            }
-        });
+    return res.status(200).json({
+        success: true,
+        message: "Farmer login successful.",
+        user: {
+            id: farmer._id,
+            name: farmer.name,
+            email: farmer.email,
+            nid:farmer.nid,
+            phone: farmer.phone,
+            profileImage: farmer.profileImage,
+            farmName: farmer.farmName,
+            verificationStatus: farmer.verificationStatus
+        },
+        role: "farmer"
+    });
 
     } catch (error) {
 

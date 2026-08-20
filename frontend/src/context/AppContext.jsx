@@ -44,7 +44,41 @@ const AppContextProvider = (props) => {
 
   useEffect(() => {
     getCurrentUser();
+    console.log(user)
   }, []);
+
+  // Update current user's profile
+const updateProfile = async (formData) => {
+  try {
+    const response = await axios.patch(
+      `${backendUrl}/api/auth/profile`,
+      formData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data.success) {
+      setUser(response.data.user);
+
+      toast.success(response.data.message);
+    }
+
+    return response.data;
+
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      "Failed to update profile.";
+
+    toast.error(message);
+
+    return {
+      success: false,
+      message,
+    };
+  }
+};
 
   // Logout user
   const logoutUser = async () => {
@@ -153,9 +187,12 @@ const loginFarmer = async (email, password) => {
       },
     );
 
-    if (response.data.success) {
-      toast.success(response.data.message);
-    }
+  if (response.data.success) {
+    setUser(response.data.user);
+    setUserRole(response.data.role);
+
+    toast.success(response.data.message);
+  }
 
     return response.data;
 
@@ -190,6 +227,9 @@ const loginShopkeeper = async (email, password) => {
     );
 
     if (response.data.success) {
+      setUser(response.data.user);
+      setUserRole(response.data.role);
+
       toast.success(response.data.message);
     }
 
@@ -222,6 +262,7 @@ const loginShopkeeper = async (email, password) => {
     loginShopkeeper,
     loading,setLoading,
     userRole,setUserRole,
+    updateProfile
   };
 
   return (

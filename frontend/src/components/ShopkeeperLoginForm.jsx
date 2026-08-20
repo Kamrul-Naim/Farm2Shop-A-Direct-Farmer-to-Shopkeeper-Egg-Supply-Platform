@@ -42,7 +42,6 @@ const ShopkeeperLoginForm = () => {
       if (result.success) {
 
         setRole("shopkeeper");
-        setUser(result.user);
         navigate("/shopkeeper/dashboard");
       }
 

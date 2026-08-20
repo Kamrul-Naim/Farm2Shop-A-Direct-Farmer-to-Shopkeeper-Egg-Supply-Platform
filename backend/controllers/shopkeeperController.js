@@ -196,15 +196,17 @@ const loginShopkeeper = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Shopkeeper login successful.",
-            shopkeeper: {
+            user: {
                 id: shopkeeper._id,
                 name: shopkeeper.name,
                 email: shopkeeper.email,
+                nid:shopkeeper.nid,
                 phone: shopkeeper.phone,
                 profileImage: shopkeeper.profileImage,
                 shopName: shopkeeper.shopName,
                 verificationStatus: shopkeeper.verificationStatus
-            }
+            },
+            role: "shopkeeper"
         });
 
     } catch (error) {

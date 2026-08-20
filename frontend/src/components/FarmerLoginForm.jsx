@@ -42,7 +42,6 @@ const FarmerLoginForm = () => {
       if (result.success) {
 
         setRole("farmer");
-        setUser(result.user);
         navigate("/farmer/dashboard");
       }
 

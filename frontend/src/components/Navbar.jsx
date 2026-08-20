@@ -5,7 +5,7 @@ import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 
 const Navbar = () => {
-  const { roleState,logoutUser,user,userRole } = useContext(AppContext);
+  const {logoutUser,user,userRole } = useContext(AppContext);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -143,7 +143,7 @@ const Navbar = () => {
                 <div className="relative group">
                   <button className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                     <img
-                      src={assets.profile_pic}
+                      src={user.profileImage}
                       alt="Profile"
                       className="w-9 h-9 rounded-full object-cover border border-gray-200"
                     />
@@ -157,14 +157,14 @@ const Navbar = () => {
                   {/* Dropdown */}
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                     <div className="p-3 border-b border-gray-100">
+
                       <p className="text-sm font-semibold text-gray-800">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 capitalize mt-0.5">
                         {userRole === "farmer"
                           ? "Farmer Account"
                           : "Shopkeeper Account"}
-                      </p>
-
-                      <p className="text-xs text-gray-500 capitalize mt-0.5">
-                        {userRole}
                       </p>
                     </div>
 
@@ -266,20 +266,21 @@ const Navbar = () => {
                 {/* User Information */}
                 <div className="flex items-center gap-3 px-3 py-2">
                   <img
-                    src={assets.logo}
+                    src={user.profileImage}
                     alt="Profile"
                     className="w-10 h-10 rounded-full object-cover border border-gray-200"
                   />
 
                   <div>
+
                     <p className="text-sm font-semibold text-gray-800">
-                      {userRole === "farmer"
-                        ? "Farmer Account"
-                        : "Shopkeeper Account"}
+                      {user.name}
                     </p>
 
                     <p className="text-xs text-gray-500 capitalize">
-                      {userRole}
+                      {userRole === "farmer"
+                        ? "Farmer Account"
+                        : "Shopkeeper Account"}
                     </p>
                   </div>
 
