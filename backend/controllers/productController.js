@@ -1,0 +1,516 @@
+import productModel from "../models/Product.js";
+import categoryPriceModel from "../models/CategoryPrice.js";
+import { uploadToCloudinary } from "../config/cloudinary.js";
+
+// Create product
+const createProduct = async (req, res) => {
+    try {
+        const {
+            productName,
+            category,
+            description,
+            quantity,
+            minimumOrderQuantity
+        } = req.body;
+
+        // Check required fields
+        if (
+            !productName ||
+            !category ||
+            !description ||
+            quantity === undefined ||
+            minimumOrderQuantity === undefined
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "All required fields must be provided."
+            });
+        }
+
+        // Validate quantity
+        if (quantity < 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Quantity cannot be negative."
+            });
+        }
+
+        // Validate minimum order quantity
+        if (minimumOrderQuantity < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "Minimum order quantity must be at least 1."
+            });
+        }
+
+        // Minimum order quantity cannot exceed available quantity
+        if (minimumOrderQuantity > quantity) {
+            return res.status(400).json({
+                success: false,
+                message: "Minimum order quantity cannot exceed available quantity."
+            });
+        }
+
+        // Find category
+        const categoryData = await categoryPriceModel.findById(category);
+
+        if (!categoryData) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found."
+            });
+        }
+
+        // Category must be active
+        if (!categoryData.isActive) {
+            return res.status(400).json({
+                success: false,
+                message: "This category is currently inactive."
+            });
+        }
+
+        // Check images
+        if (!req.files || req.files.length < 1 || req.files.length > 3) {
+            return res.status(400).json({
+                success: false,
+                message: "A product must have between 1 and 3 images."
+            });
+        }
+
+        // Upload images to Cloudinary
+        const imageUrls = [];
+
+        for (const file of req.files) {
+            const result = await uploadToCloudinary(
+                file.buffer,
+                "products"
+            );
+
+            imageUrls.push(result.secure_url);
+        }
+
+        // Product expires after 7 days
+        const expiresAt = new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000
+        );
+
+        // Farmer comes from authenticated user
+        const farmerId = req.user.id;
+
+        // Create product
+        const product = await productModel.create({
+            productName,
+            category,
+            description,
+            images: imageUrls,
+            quantity,
+            minimumOrderQuantity,
+            farmer: farmerId,
+            isAvailable: true,
+            expiresAt
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Product created successfully.",
+            product
+        });
+
+    } catch (error) {
+        console.error("Create product error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while creating the product."
+        });
+    }
+};
+
+// Get available products
+const getProducts = async (req, res) => {
+    try {
+        const products = await productModel
+            .find({
+                isAvailable: true,
+                expiresAt: { $gt: new Date() }
+            })
+            .populate(
+                "category",
+                "category price"
+            )
+            .populate(
+                "farmer",
+                "name farmName farmAddress profileImage"
+            )
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            products
+        });
+
+    } catch (error) {
+        console.error("Get products error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch products."
+        });
+    }
+};
+
+// Get products created by the logged-in farmer
+const getMyProducts = async (req, res) => {
+    try {
+        const farmerId = req.user.id;
+
+        const products = await productModel
+            .find({
+                farmer: farmerId
+            })
+            .populate(
+                "category",
+                "category price"
+            )
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            products
+        });
+
+    } catch (error) {
+        console.error("Get my products error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch your products."
+        });
+    }
+};
+
+// Get single product by ID
+const getProductById = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        const product = await productModel
+            .findById(productId)
+            .populate(
+                "category",
+                "category price"
+            )
+            .populate(
+                "farmer",
+                "name farmName farmAddress farmDescription profileImage"
+            );
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            product
+        });
+
+    } catch (error) {
+        console.error("Get product by ID error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch product."
+        });
+    }
+};
+
+// Update product
+const updateProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        const {
+            productName,
+            description,
+            quantity,
+            minimumOrderQuantity
+        } = req.body;
+
+        // Find product belonging to the logged-in farmer
+        const product = await productModel.findOne({
+            _id: productId,
+            farmer: req.user.id
+        });
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found."
+            });
+        }
+
+        // Update allowed fields only
+        if (productName !== undefined) {
+            if (!productName.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Product name cannot be empty."
+                });
+            }
+
+            product.productName = productName.trim();
+        }
+
+        if (description !== undefined) {
+            if (!description.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Product description cannot be empty."
+                });
+            }
+
+            product.description = description.trim();
+        }
+
+        if (quantity !== undefined) {
+            if (quantity < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Quantity cannot be negative."
+                });
+            }
+
+            product.quantity = quantity;
+        }
+
+        if (minimumOrderQuantity !== undefined) {
+            if (minimumOrderQuantity < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Minimum order quantity must be at least 1."
+                });
+            }
+
+            product.minimumOrderQuantity = minimumOrderQuantity;
+        }
+
+        // Validate final quantity relationship
+        if (
+            product.minimumOrderQuantity >
+            product.quantity
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Minimum order quantity cannot exceed available quantity."
+            });
+        }
+
+        // Update images if new images were uploaded
+        if (req.files && req.files.length > 0) {
+
+            if (req.files.length > 3) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "A product can have a maximum of 3 images."
+                });
+            }
+
+            const imageUrls = [];
+
+            for (const file of req.files) {
+                const result = await uploadToCloudinary(
+                    file.buffer,
+                    "products"
+                );
+
+                imageUrls.push(result.secure_url);
+            }
+
+            product.images = imageUrls;
+        }
+
+        await product.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Product updated successfully.",
+            product
+        });
+
+    } catch (error) {
+        console.error("Update product error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while updating the product."
+        });
+    }
+};
+
+// Remove product
+const removeProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        // Find the product belonging to the logged-in farmer
+        const product = await productModel.findOne({
+            _id: productId,
+            farmer: req.user.id
+        });
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found."
+            });
+        }
+
+        // Check if already unavailable
+        if (!product.isAvailable) {
+            return res.status(400).json({
+                success: false,
+                message: "Product is already unavailable."
+            });
+        }
+
+        // Do not delete the document.
+        // Simply make the product unavailable.
+        product.isAvailable = false;
+
+        await product.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Product removed successfully."
+        });
+
+    } catch (error) {
+        console.error("Remove product error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while removing the product."
+        });
+    }
+};
+
+// Admin removes a product
+const removeProductByAdmin = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        const product = await productModel.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found."
+            });
+        }
+
+        if (!product.isAvailable) {
+            return res.status(400).json({
+                success: false,
+                message: "Product is already unavailable."
+            });
+        }
+
+        product.isAvailable = false;
+
+        await product.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Product removed successfully by admin."
+        });
+
+    } catch (error) {
+        console.error("Admin remove product error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while removing the product."
+        });
+    }
+};
+
+// Admin gets all products
+const getAllProductsForAdmin = async (req, res) => {
+    try {
+        const products = await productModel
+            .find({})
+            .populate(
+                "category",
+                "category price"
+            )
+            .populate(
+                "farmer",
+                "name email phone farmName farmAddress profileImage"
+            )
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            products
+        });
+
+    } catch (error) {
+        console.error(
+            "Admin get all products error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch products."
+        });
+    }
+};
+
+// Admin gets a single product
+const getProductByIdForAdmin = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        const product = await productModel
+            .findById(productId)
+            .populate(
+                "category",
+                "category price"
+            )
+            .populate(
+                "farmer",
+                "name email phone farmName farmAddress farmDescription profileImage verificationStatus"
+            );
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            product
+        });
+
+    } catch (error) {
+        console.error(
+            "Admin get product by ID error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch product."
+        });
+    }
+};
+
+export { createProduct, getProducts, getMyProducts, getProductById, updateProduct, removeProduct, removeProductByAdmin, getAllProductsForAdmin, getProductByIdForAdmin };

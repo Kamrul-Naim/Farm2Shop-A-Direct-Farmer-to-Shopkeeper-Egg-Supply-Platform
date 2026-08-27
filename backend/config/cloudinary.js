@@ -32,6 +32,7 @@ const uploadToCloudinary = (buffer, folder) => {
     });
 };
 
+
 export { uploadToCloudinary };
 
 export default connectCloudinary;
