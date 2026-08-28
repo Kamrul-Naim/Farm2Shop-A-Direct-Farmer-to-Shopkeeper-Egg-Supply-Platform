@@ -190,6 +190,28 @@ const getAllCategories = async (req, res) => {
     }
 };
 
+// Get all categories
+const getCategories = async (req, res) => {
+    try {
+        const categories = await categoryPriceModel
+            .find({})
+            .sort({ category: 1 });
+
+        return res.status(200).json({
+            success: true,
+            categories
+        });
+
+    } catch (error) {
+        console.error("Get categories error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch categories."
+        });
+    }
+};
+
 
 export {
     createCategoryPrice,
@@ -197,4 +219,5 @@ export {
     toggleCategoryStatus,
     getActiveCategories,
     getAllCategories,
+    getCategories
 };

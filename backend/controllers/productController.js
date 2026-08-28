@@ -252,7 +252,15 @@ const updateProduct = async (req, res) => {
             });
         }
 
-        // Update allowed fields only
+        // Unavailable products cannot be edited
+        if (!product.isAvailable) {
+            return res.status(400).json({
+                success: false,
+                message: "Unavailable products cannot be edited."
+            });
+        }
+
+        // Update product name
         if (productName !== undefined) {
             if (!productName.trim()) {
                 return res.status(400).json({
@@ -264,6 +272,7 @@ const updateProduct = async (req, res) => {
             product.productName = productName.trim();
         }
 
+        // Update description
         if (description !== undefined) {
             if (!description.trim()) {
                 return res.status(400).json({
@@ -275,29 +284,44 @@ const updateProduct = async (req, res) => {
             product.description = description.trim();
         }
 
+        // Update quantity
         if (quantity !== undefined) {
-            if (quantity < 0) {
+            const updatedQuantity = Number(quantity);
+
+            if (
+                Number.isNaN(updatedQuantity) ||
+                updatedQuantity < 0
+            ) {
                 return res.status(400).json({
                     success: false,
                     message: "Quantity cannot be negative."
                 });
             }
 
-            product.quantity = quantity;
+            product.quantity = updatedQuantity;
         }
 
+        // Update minimum order quantity
         if (minimumOrderQuantity !== undefined) {
-            if (minimumOrderQuantity < 1) {
+            const updatedMinimumOrderQuantity =
+                Number(minimumOrderQuantity);
+
+            if (
+                Number.isNaN(updatedMinimumOrderQuantity) ||
+                updatedMinimumOrderQuantity < 1
+            ) {
                 return res.status(400).json({
                     success: false,
-                    message: "Minimum order quantity must be at least 1."
+                    message:
+                        "Minimum order quantity must be at least 1."
                 });
             }
 
-            product.minimumOrderQuantity = minimumOrderQuantity;
+            product.minimumOrderQuantity =
+                updatedMinimumOrderQuantity;
         }
 
-        // Validate final quantity relationship
+        // Minimum order quantity cannot exceed available quantity
         if (
             product.minimumOrderQuantity >
             product.quantity
@@ -309,30 +333,81 @@ const updateProduct = async (req, res) => {
             });
         }
 
-        // Update images if new images were uploaded
+        /*
+         * Existing images that the farmer wants to keep.
+         *
+         * The frontend sends these as:
+         *
+         * existingImages: [url1, url2]
+         */
+        let existingImages = req.body.existingImages || [];
+
+        // If only one existing image is sent,
+        // convert it into an array.
+        if (!Array.isArray(existingImages)) {
+            existingImages = [existingImages];
+        }
+
+        /*
+         * Upload newly added images.
+         */
+        const newImageUrls = [];
+
         if (req.files && req.files.length > 0) {
 
-            if (req.files.length > 3) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "A product can have a maximum of 3 images."
-                });
-            }
-
-            const imageUrls = [];
-
             for (const file of req.files) {
+
+                // Prevent total images from exceeding 3
+                if (
+                    existingImages.length +
+                    newImageUrls.length >= 3
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            "A product can have a maximum of 3 images."
+                    });
+                }
+
                 const result = await uploadToCloudinary(
                     file.buffer,
                     "products"
                 );
 
-                imageUrls.push(result.secure_url);
+                newImageUrls.push(result.secure_url);
             }
-
-            product.images = imageUrls;
         }
+
+        /*
+         * Final image list:
+         *
+         * Existing images that remain
+         * +
+         * Newly uploaded images
+         */
+        const finalImages = [
+            ...existingImages,
+            ...newImageUrls
+        ];
+
+        // Product must always have 1–3 images
+        if (finalImages.length < 1) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "A product must have at least 1 image."
+            });
+        }
+
+        if (finalImages.length > 3) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "A product can have a maximum of 3 images."
+            });
+        }
+
+        product.images = finalImages;
 
         await product.save();
 
@@ -347,10 +422,12 @@ const updateProduct = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while updating the product."
+            message:
+                "Something went wrong while updating the product."
         });
     }
 };
+
 
 // Remove product
 const removeProduct = async (req, res) => {

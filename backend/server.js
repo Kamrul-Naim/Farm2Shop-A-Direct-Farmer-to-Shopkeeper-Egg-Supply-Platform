@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser"
 import adminRouter from "./routes/adminRoutes.js"
 import productRouter from "./routes/productRoutes.js"
 import adminProductRouter from "./routes/adminProductRoutes.js"
+import categoryRouter from "./routes/categoryRouter.js"
 
 // app config
 const app = express()
@@ -35,6 +36,10 @@ app.use("/api/products", productRouter);
 app.use(
     "/api/admin/products",
     adminProductRouter
+);
+app.use(
+    "/api/categories",
+    categoryRouter
 );
 
 app.get("/", (req, res) => {

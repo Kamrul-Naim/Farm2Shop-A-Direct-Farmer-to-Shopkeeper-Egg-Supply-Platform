@@ -23,6 +23,8 @@ import ProtectedRoute from './Routes/ProtectedRoute';
 import PublicOnlyRoute from './Routes/PublicOnlyRoute';
 import FarmerProfile from './pages/Farmer/FarmerProfile';
 import ShopkeeperProfile from './pages/Shopkeeper/ShopkeeperProfile';
+import FarmerProductDetails from './pages/Farmer/FarmerProductDetails';
+import EditProduct from './pages/Farmer/EditProduct';
 
 
 
@@ -53,8 +55,8 @@ const App = () => {
           <Route path="/about" element={<About />} />
 
           <Route element={<PublicOnlyRoute />}>
-            <Route path='/register' element={<Registration/>}/>
-            <Route path='/login' element={<Login/>}/>
+            <Route path="/register" element={<Registration />} />
+            <Route path="/login" element={<Login />} />
           </Route>
 
           {/* Farmer protected routes */}
@@ -63,7 +65,15 @@ const App = () => {
             <Route path="/farmer/stock" element={<MyStock />} />
             <Route path="/farmer/orders" element={<Orders />} />
             <Route path="/farmer/earnings" element={<Earnings />} />
-            <Route path='/farmer/profile' element={<FarmerProfile/>}/>
+            <Route path="/farmer/profile" element={<FarmerProfile />} />
+            <Route
+              path="/farmer/product/:productId"
+              element={<FarmerProductDetails />}
+            />
+            <Route
+              path="/farmer/edit-product/:productId"
+              element={<EditProduct />}
+            />
           </Route>
 
           {/* Shopkeeper protected routes */}
@@ -74,7 +84,7 @@ const App = () => {
             />
             <Route path="/shopkeeper/marketplace" element={<Marketplace />} />
             <Route path="/shopkeeper/orders" element={<MyOrders />} />
-            <Route path='/shopkeeper/profile' element={<ShopkeeperProfile/>}/>
+            <Route path="/shopkeeper/profile" element={<ShopkeeperProfile />} />
           </Route>
         </Routes>
       </div>
