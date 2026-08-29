@@ -10,6 +10,7 @@ import {
 } from "../controllers/productController.js";
 
 import farmerAuthMiddleware from "../middlewares/farmerAuthMiddleware.js";
+import verifiedFarmerMiddleware from "../middlewares/verifiedFarmerMiddleware.js";
 
 import productUpload from "../middlewares/productUpload.js";
 
@@ -20,6 +21,7 @@ const productRouter = express.Router();
 productRouter.post(
     "/",
     farmerAuthMiddleware,
+    verifiedFarmerMiddleware,
     productUpload.array("images", 3),
     createProduct
 );

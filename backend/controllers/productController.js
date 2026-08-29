@@ -2,24 +2,29 @@ import productModel from "../models/Product.js";
 import categoryPriceModel from "../models/CategoryPrice.js";
 import { uploadToCloudinary } from "../config/cloudinary.js";
 
+
 // Create product
 const createProduct = async (req, res) => {
     try {
         const {
             productName,
             category,
-            description,
-            quantity,
-            minimumOrderQuantity
+            description
         } = req.body;
 
-        // Check required fields
+        // Convert multipart/form-data values to numbers
+        const quantity = Number(req.body.quantity);
+        const minimumOrderQuantity = Number(
+            req.body.minimumOrderQuantity
+        );
+
+        // Check required text fields
         if (
-            !productName ||
+            !productName?.trim() ||
             !category ||
-            !description ||
-            quantity === undefined ||
-            minimumOrderQuantity === undefined
+            !description?.trim() ||
+            req.body.quantity === undefined ||
+            req.body.minimumOrderQuantity === undefined
         ) {
             return res.status(400).json({
                 success: false,
@@ -28,18 +33,26 @@ const createProduct = async (req, res) => {
         }
 
         // Validate quantity
-        if (quantity < 0) {
+        if (
+            !Number.isFinite(quantity) ||
+            quantity < 0
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Quantity cannot be negative."
+                message:
+                    "Quantity must be a valid non-negative number."
             });
         }
 
         // Validate minimum order quantity
-        if (minimumOrderQuantity < 1) {
+        if (
+            !Number.isFinite(minimumOrderQuantity) ||
+            minimumOrderQuantity < 1
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Minimum order quantity must be at least 1."
+                message:
+                    "Minimum order quantity must be a valid number of at least 1."
             });
         }
 
@@ -47,12 +60,14 @@ const createProduct = async (req, res) => {
         if (minimumOrderQuantity > quantity) {
             return res.status(400).json({
                 success: false,
-                message: "Minimum order quantity cannot exceed available quantity."
+                message:
+                    "Minimum order quantity cannot exceed available quantity."
             });
         }
 
         // Find category
-        const categoryData = await categoryPriceModel.findById(category);
+        const categoryData =
+            await categoryPriceModel.findById(category);
 
         if (!categoryData) {
             return res.status(404).json({
@@ -65,15 +80,21 @@ const createProduct = async (req, res) => {
         if (!categoryData.isActive) {
             return res.status(400).json({
                 success: false,
-                message: "This category is currently inactive."
+                message:
+                    "This category is currently inactive."
             });
         }
 
         // Check images
-        if (!req.files || req.files.length < 1 || req.files.length > 3) {
+        if (
+            !req.files ||
+            req.files.length < 1 ||
+            req.files.length > 3
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "A product must have between 1 and 3 images."
+                message:
+                    "A product must have between 1 and 3 images."
             });
         }
 
@@ -99,9 +120,9 @@ const createProduct = async (req, res) => {
 
         // Create product
         const product = await productModel.create({
-            productName,
+            productName: productName.trim(),
             category,
-            description,
+            description: description.trim(),
             images: imageUrls,
             quantity,
             minimumOrderQuantity,
@@ -117,14 +138,19 @@ const createProduct = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Create product error:", error);
+        console.error(
+            "Create product error:",
+            error
+        );
 
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while creating the product."
+            message:
+                "Something went wrong while creating the product."
         });
     }
 };
+
 
 // Get available products
 const getProducts = async (req, res) => {
