@@ -3,14 +3,74 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX, FiBell, FiUser, FiChevronDown } from "react-icons/fi";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
+import axios from "axios";
 
 const Navbar = () => {
-  const {logoutUser,user,userRole } = useContext(AppContext);
+  const { logoutUser, user, userRole, backendUrl } = useContext(AppContext);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationLoading, setNotificationLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      const { data } = await axios.patch(
+        `${backendUrl}/api/notifications/${notificationId}/read`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (data.success) {
+        setNotifications((prev) =>
+          prev.map((notification) =>
+            notification._id === notificationId
+              ? {
+                  ...notification,
+                  isRead: true,
+                }
+              : notification,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Mark notification as read error:", error);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      setNotificationLoading(true);
+
+      const { data } = await axios.get(`${backendUrl}/api/notifications`, {
+        withCredentials: true,
+      });
+
+      console.log("Notification API response:", data);
+
+      if (data.success) {
+        setNotifications(data.notifications || []);
+      }
+    } catch (error) {
+      console.error("Fetch notifications error:", error);
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    console.log(notifications);
+  }, [user]);
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead,
+  ).length;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,11 +193,105 @@ const Navbar = () => {
             {user && (
               <>
                 {/* Notifications */}
-                <button className="relative p-2 text-gray-600 hover:text-[#176B3A] transition-colors">
-                  <FiBell size={20} />
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications((prev) => !prev)}
+                    className="relative p-2 rounded-full hover:bg-gray-100 transition"
+                    aria-label="Notifications"
+                  >
+                    <FiBell size={20} />
 
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#F4A62A] rounded-full" />
-                </button>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+                      {/* Header */}
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-bold text-gray-800">
+                            Notifications
+                          </h3>
+
+                          {unreadCount > 0 && (
+                            <span className="text-xs font-semibold text-[#176B3A]">
+                              {unreadCount} unread
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Notification List */}
+                      <div className="h-[400px] overflow-y-auto">
+                        {notificationLoading ? (
+                          <div className="p-6 text-center text-sm text-gray-500">
+                            Loading notifications...
+                          </div>
+                        ) : notifications.length === 0 ? (
+                          <div className="p-8 text-center">
+                            <FiBell
+                              size={28}
+                              className="mx-auto text-gray-300"
+                            />
+
+                            <p className="mt-3 text-sm font-medium text-gray-700">
+                              No notifications
+                            </p>
+
+                            <p className="mt-1 text-xs text-gray-400">
+                              You're all caught up.
+                            </p>
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <button
+                              key={notification._id}
+                              onClick={() => {
+                                if (!notification.isRead) {
+                                  markNotificationAsRead(notification._id);
+                                }
+                              }}
+                              className={`w-full text-left px-4 py-4 border-b border-gray-100 hover:bg-gray-50 transition ${
+                                !notification.isRead
+                                  ? "bg-green-50"
+                                  : "bg-white"
+                              }`}
+                            >
+                              <div className="flex gap-3">
+                                <span
+                                  className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
+                                    notification.isRead
+                                      ? "bg-gray-300"
+                                      : "bg-[#176B3A]"
+                                  }`}
+                                />
+
+                                <div className="flex-1">
+                                  <p className="text-sm font-semibold text-gray-800">
+                                    {notification.title}
+                                  </p>
+
+                                  <p className="mt-1 text-sm text-gray-500">
+                                    {notification.message}
+                                  </p>
+
+                                  <p className="mt-2 text-xs text-gray-400">
+                                    {new Date(
+                                      notification.createdAt,
+                                    ).toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Profile Dropdown */}
                 <div className="relative group">
@@ -157,7 +311,6 @@ const Navbar = () => {
                   {/* Dropdown */}
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                     <div className="p-3 border-b border-gray-100">
-
                       <p className="text-sm font-semibold text-gray-800">
                         {user.name}
                       </p>
@@ -272,7 +425,6 @@ const Navbar = () => {
                   />
 
                   <div>
-
                     <p className="text-sm font-semibold text-gray-800">
                       {user.name}
                     </p>
@@ -285,11 +437,130 @@ const Navbar = () => {
                   </div>
 
                   {/* Notification */}
-                  <button className="relative ml-auto p-2 text-gray-500 hover:text-[#176B3A] transition-colors">
-                    <FiBell size={19} />
+                  {/* Notification */}
+<div className="mt-2">
 
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-[#F4A62A] rounded-full" />
-                  </button>
+  {/* Notification Bell */}
+  <button
+    onClick={() =>
+      setShowNotifications((prev) => !prev)
+    }
+    className="relative flex items-center gap-3 w-full px-3 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#176B3A] transition-colors"
+    aria-label="Notifications"
+  >
+    <div className="relative">
+      <FiBell size={21} />
+
+      {unreadCount > 0 && (
+        <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+      )}
+    </div>
+
+    {/* <span>Notifications</span> */}
+  </button>
+
+  {/* Notification Panel */}
+  {showNotifications && (
+    <div className="mt-2 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+
+          <h3 className="font-bold text-gray-800">
+            Notifications
+          </h3>
+
+          {unreadCount > 0 && (
+            <span className="text-xs font-semibold text-[#176B3A]">
+              {unreadCount} unread
+            </span>
+          )}
+
+        </div>
+      </div>
+
+      {/* Notification List */}
+      <div className="h-[350px] overflow-y-auto">
+
+        {notificationLoading ? (
+          <div className="p-6 text-center text-sm text-gray-500">
+            Loading notifications...
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="p-8 text-center">
+
+            <FiBell
+              size={28}
+              className="mx-auto text-gray-300"
+            />
+
+            <p className="mt-3 text-sm font-medium text-gray-700">
+              No notifications
+            </p>
+
+            <p className="mt-1 text-xs text-gray-400">
+              You're all caught up.
+            </p>
+
+          </div>
+        ) : (
+          notifications.map((notification) => (
+            <button
+              key={notification._id}
+              onClick={() => {
+                if (!notification.isRead) {
+                  markNotificationAsRead(
+                    notification._id
+                  );
+                }
+              }}
+              className={`w-full text-left px-4 py-4 border-b border-gray-100 hover:bg-gray-50 transition ${
+                !notification.isRead
+                  ? "bg-green-50"
+                  : "bg-white"
+              }`}
+            >
+              <div className="flex gap-3">
+
+                <span
+                  className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
+                    notification.isRead
+                      ? "bg-gray-300"
+                      : "bg-[#176B3A]"
+                  }`}
+                />
+
+                <div className="flex-1 min-w-0">
+
+                  <p className="text-sm font-semibold text-gray-800">
+                    {notification.title}
+                  </p>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    {notification.message}
+                  </p>
+
+                  <p className="mt-2 text-xs text-gray-400">
+                    {new Date(
+                      notification.createdAt
+                    ).toLocaleString()}
+                  </p>
+
+                </div>
+
+              </div>
+            </button>
+          ))
+        )}
+
+      </div>
+    </div>
+  )}
+
+</div>
                 </div>
 
                 {/* Profile Actions */}
