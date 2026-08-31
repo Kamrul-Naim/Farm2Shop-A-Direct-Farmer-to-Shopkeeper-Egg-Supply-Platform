@@ -27,6 +27,12 @@ import FarmerProductDetails from "./pages/Farmer/FarmerProductDetails";
 import EditProduct from "./pages/Farmer/EditProduct";
 import ProductDetails from "./pages/Shopkeeper/ProductDetails";
 import AddProduct from "./pages/Farmer/AddProduct";
+import OrderPlacement from "./pages/Shopkeeper/OrderPlacement";
+import ShopkeeperOrderDetails from "./pages/Shopkeeper/ShopkeeperOrderDetails";
+import FarmerOrderDetails from "./pages/Farmer/FarmerOrderDetails";
+import PaymentSuccess from "./pages/Shopkeeper/PaymentSuccess";
+import PaymentFail from "./pages/Shopkeeper/PaymentFail";
+import PaymentCancel from "./pages/Shopkeeper/PaymentCancel";
 
 const App = () => {
   const { loading } = useContext(AppContext);
@@ -73,6 +79,10 @@ const App = () => {
             />
 
             <Route path="/farmer/add-product" element={<AddProduct />} />
+            <Route
+              path="/farmer/order/:orderId"
+              element={<FarmerOrderDetails />}
+            />
           </Route>
 
           {/* Shopkeeper protected routes */}
@@ -88,6 +98,19 @@ const App = () => {
               path="/shopkeeper/product/:productId"
               element={<ProductDetails />}
             />
+            <Route
+              path="/shopkeeper/order/:productId"
+              element={<OrderPlacement />}
+            />
+            <Route
+              path="/shopkeeper/orders/:orderId"
+              element={<ShopkeeperOrderDetails />}
+            />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+
+            <Route path="/payment/fail" element={<PaymentFail />} />
+
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
           </Route>
         </Routes>
       </div>

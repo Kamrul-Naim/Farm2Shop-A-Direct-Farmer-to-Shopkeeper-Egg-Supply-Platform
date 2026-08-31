@@ -14,6 +14,7 @@ import categoryRouter from "./routes/categoryRouter.js"
 import orderRouter from "./routes/orderRoute.js"
 import notificationRouter from "./routes/notificationRoute.js"
 import adminVerificationRouter from "./routes/adminVerificationRoute.js"
+import paymentRouter from "./routes/paymentRoute.js"
 
 // app config
 const app = express()
@@ -51,6 +52,11 @@ app.use("/api/notifications", notificationRouter);
 app.use(
     "/api/admin/verification",
     adminVerificationRouter
+);
+
+app.use(
+    "/api/payment",
+    paymentRouter
 );
 
 app.get("/", (req, res) => {
