@@ -181,36 +181,29 @@ const initiateSSLCommerzPayment = async (req, res) => {
         await order.save();
 
         const paymentResponse = await initiatePayment({
-            transactionId,
-            amount: order.totalAmount,
+          transactionId,
+          amount: order.totalAmount,
 
-            productName:
-                order.product?.productName ||
-                "Egg Order",
+          productName: order.product?.productName || "Egg Order",
 
-            customerName:
-                shopkeeper.name,
+          customerName: shopkeeper.name,
 
-            customerEmail:
-                shopkeeper.email,
+          customerEmail: shopkeeper.email,
 
-            customerPhone:
-                shopkeeper.phone,
+          customerPhone: shopkeeper.phone,
 
-            deliveryAddress:
-                order.deliveryAddress,
+          deliveryAddress: order.deliveryAddress,
 
-            successUrl:
-                `${process.env.BACKEND_URL}/api/payment/sslcommerz/success`,
+          // Temporary testing value
+          deliveryPostcode: "1207",
 
-            failUrl:
-                `${process.env.BACKEND_URL}/api/payment/sslcommerz/fail`,
+          successUrl: `${process.env.BACKEND_URL}/api/payment/sslcommerz/success`,
 
-            cancelUrl:
-                `${process.env.BACKEND_URL}/api/payment/sslcommerz/cancel`,
+          failUrl: `${process.env.BACKEND_URL}/api/payment/sslcommerz/fail`,
 
-            ipnUrl:
-                `${process.env.BACKEND_URL}/api/payment/sslcommerz/ipn`
+          cancelUrl: `${process.env.BACKEND_URL}/api/payment/sslcommerz/cancel`,
+
+          ipnUrl: `${process.env.BACKEND_URL}/api/payment/sslcommerz/ipn`,
         });
 
         if (

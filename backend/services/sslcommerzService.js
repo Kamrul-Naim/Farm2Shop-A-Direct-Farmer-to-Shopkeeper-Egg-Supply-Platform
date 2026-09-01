@@ -9,10 +9,10 @@ const SSLCOMMERZ_STORE_PASSWORD =
 const SSLCOMMERZ_IS_SANDBOX =
     process.env.SSLCOMMERZ_IS_SANDBOX === "true";
 
-
-const SSLCOMMERZ_BASE_URL = SSLCOMMERZ_IS_SANDBOX
-    ? "https://sandbox.sslcommerz.com"
-    : "https://securepay.sslcommerz.com";
+const SSLCOMMERZ_BASE_URL =
+    SSLCOMMERZ_IS_SANDBOX
+        ? "https://sandbox.sslcommerz.com"
+        : "https://securepay.sslcommerz.com";
 
 
 const initiatePayment = async ({
@@ -23,6 +23,7 @@ const initiatePayment = async ({
     customerEmail,
     customerPhone,
     deliveryAddress,
+    deliveryPostcode,
     successUrl,
     failUrl,
     cancelUrl,
@@ -57,9 +58,11 @@ const initiatePayment = async ({
             cus_country: "Bangladesh",
 
             shipping_method: "YES",
+
             ship_name: customerName,
             ship_add1: deliveryAddress,
             ship_city: "Dhaka",
+            ship_postcode: deliveryPostcode,
             ship_country: "Bangladesh",
 
             num_of_item: 1
@@ -82,7 +85,8 @@ const initiatePayment = async ({
 
         console.error(
             "SSLCOMMERZ payment initiation error:",
-            error.response?.data || error.message
+            error.response?.data ||
+            error.message
         );
 
         throw error;
