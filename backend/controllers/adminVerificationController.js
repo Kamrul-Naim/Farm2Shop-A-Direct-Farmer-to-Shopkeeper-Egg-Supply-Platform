@@ -1,5 +1,6 @@
 import farmerModel from "../models/farmer.js";
 import shopkeeperModel from "../models/shopkeeper.js";
+// import shopkeeperModel from "../models/Shopkeeper.js";
 import createNotification from "../utils/createNotification.js";
 
 // Update farmer verification status

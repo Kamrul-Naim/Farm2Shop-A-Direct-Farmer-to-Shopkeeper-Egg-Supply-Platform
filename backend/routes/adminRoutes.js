@@ -4,6 +4,7 @@ import {
     loginAdmin,
     getCurrentAdmin,
     logoutAdmin,
+    getDashboardStats
 } from "../controllers/adminController.js";
 
 import { createCategoryPrice,getAllCategories,updateCategoryPrice,toggleCategoryStatus } from "../controllers/categoryPriceController.js";
@@ -24,6 +25,12 @@ adminRouter.get(
     getCurrentAdmin
 );
 
+// Admin dashboard statistics
+adminRouter.get(
+    "/dashboard",
+    adminAuthMiddleware,
+    getDashboardStats
+);
 
 // Admin logout
 adminRouter.post(

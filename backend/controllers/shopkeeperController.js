@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import shopkeeperModel from "../models/Shopkeeper.js";
+import shopkeeperModel from "../models/shopkeeper.js";
 import { uploadToCloudinary } from "../config/cloudinary.js";
 import generateToken from "../utils/generateToken.js";
 

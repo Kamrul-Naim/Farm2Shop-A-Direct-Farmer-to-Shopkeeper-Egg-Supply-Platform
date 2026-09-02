@@ -1,5 +1,8 @@
 import bcrypt from "bcrypt";
 import adminModel from "../models/admin.js";
+import orderModel from "../models/orderModel.js";
+import shopkeeperModel from "../models/shopkeeper.js";
+import farmerModel from "../models/farmer.js";
 import generateAdminToken from "../utils/generateAdminToken.js";
 
 // Admin login
@@ -135,7 +138,89 @@ const logoutAdmin = (req, res) => {
     }
 };
 
+// Get admin dashboard statistics
+const getDashboardStats = async (req, res) => {
+    try {
+
+        // Total orders
+        const totalOrders = await orderModel.countDocuments();
+
+
+        // Total shopkeepers
+        const totalShopkeepers =
+            await shopkeeperModel.countDocuments();
+
+
+        // Total farmers
+        const totalFarmers =
+            await farmerModel.countDocuments();
+
+
+        // Total eggs sold from completed/delivered orders
+        const eggsSoldResult = await orderModel.aggregate([
+            {
+                $match: {
+                    orderStatus: "delivered"
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalEggsSold: {
+                        $sum: "$quantity"
+                    }
+                }
+            }
+        ]);
+
+
+        const totalEggsSold =
+            eggsSoldResult.length > 0
+                ? eggsSoldResult[0].totalEggsSold
+                : 0;
+
+
+        // Platform earns ৳1 per egg
+        const platformEarnings = totalEggsSold * 1;
+
+
+        // Recent orders
+        const recentOrders = await orderModel
+            .find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate("shopkeeper", "name shopName")
+            .populate("farmer", "name farmName")
+            .populate("category", "name");
+
+
+        return res.status(200).json({
+            success: true,
+
+            stats: {
+                totalOrders,
+                totalShopkeepers,
+                totalFarmers,
+                totalEggsSold,
+                platformEarnings
+            },
+
+            recentOrders
+        });
+
+    } catch (error) {
+
+        console.error("Get dashboard stats error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch dashboard statistics."
+        });
+    }
+};
+
 export { loginAdmin,
     getCurrentAdmin,
     logoutAdmin,
+    getDashboardStats
  };
