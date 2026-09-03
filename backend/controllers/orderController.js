@@ -435,12 +435,183 @@ const updateOrderStatus = async (req, res) => {
 };
 
 
+// Get all orders - Admin only
+const getAllOrdersForAdmin = async (req, res) => {
+    try {
+        const orders = await orderModel
+            .find({})
+            .populate(
+                "product",
+                "productName images"
+            )
+            .populate(
+                "category",
+                "category price"
+            )
+            .populate(
+                "shopkeeper",
+                "name shopName shopAddress"
+            )
+            .populate(
+                "farmer",
+                "name farmName farmAddress"
+            )
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            orders
+        });
+
+    } catch (error) {
+        console.error(
+            "Get all orders for admin error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch orders."
+        });
+    }
+};
+
+// Get single order - Admin only
+const getOrderByIdForAdmin = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await orderModel
+            .findById(orderId)
+            .populate(
+                "product",
+                "productName description images quantity"
+            )
+            .populate(
+                "category",
+                "category price"
+            )
+            .populate(
+                "shopkeeper",
+                "name shopName shopAddress profileImage phone email"
+            )
+            .populate(
+                "farmer",
+                "name farmName farmAddress profileImage phone email"
+            );
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            order
+        });
+
+    } catch (error) {
+        console.error(
+            "Get admin order by ID error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch order."
+        });
+    }
+};
+
+
+// Update payment status - Admin only
+const updatePaymentStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { paymentStatus } = req.body;
+
+        const allowedStatuses = [
+            "pending",
+            "paid",
+            "failed",
+            "refunded"
+        ];
+
+        if (!allowedStatuses.includes(paymentStatus)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid payment status."
+            });
+        }
+
+        const order = await orderModel.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found."
+            });
+        }
+
+        // Online payments must be confirmed by the payment gateway.
+        if (
+            paymentStatus === "paid" &&
+            order.paymentMethod === "online" &&
+            order.paymentStatus !== "paid"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Online payment cannot be manually marked as paid."
+            });
+        }
+
+        // Do not allow payment changes after refund.
+        if (
+            order.paymentStatus === "refunded" &&
+            paymentStatus !== "refunded"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "A refunded payment cannot be changed."
+            });
+        }
+
+        order.paymentStatus = paymentStatus;
+
+        await order.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment status updated successfully.",
+            order
+        });
+
+    } catch (error) {
+        console.error(
+            "Update payment status error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update payment status."
+        });
+    }
+};
+
 
 export {
     createOrder,
     getShopkeeperOrders,
     getFarmerOrders,
     getOrderById,
-    updateOrderStatus
+    updateOrderStatus,
+    getAllOrdersForAdmin,
+    getOrderByIdForAdmin,
+    updatePaymentStatus,
 };
 

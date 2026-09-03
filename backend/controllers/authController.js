@@ -1,5 +1,5 @@
 import farmerModel from "../models/farmer.js";
-import shopkeeperModel from "../models/Shopkeeper.js";
+import shopkeeperModel from "../models/shopkeeper.js";
 import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
 import { uploadToCloudinary } from "../config/cloudinary.js";

@@ -212,6 +212,113 @@ const getCategories = async (req, res) => {
     }
 };
 
+// Update category name and price
+const updateCategory = async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+        const { category, price } = req.body;
+
+        // Validate category
+        if (!category || !category.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Category name is required."
+            });
+        }
+
+        // Validate price
+        if (price === undefined || price === null) {
+            return res.status(400).json({
+                success: false,
+                message: "Price is required."
+            });
+        }
+
+        if (Number(price) < 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Price cannot be negative."
+            });
+        }
+
+        // Find category
+        const existingCategory = await categoryPriceModel.findById(
+            categoryId
+        );
+
+        if (!existingCategory) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found."
+            });
+        }
+
+        // Check duplicate category name
+        const duplicateCategory = await categoryPriceModel.findOne({
+            category: category.trim(),
+            _id: { $ne: categoryId }
+        });
+
+        if (duplicateCategory) {
+            return res.status(409).json({
+                success: false,
+                message: "This category already exists."
+            });
+        }
+
+        // Update
+        existingCategory.category = category.trim();
+        existingCategory.price = Number(price);
+
+        await existingCategory.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Category updated successfully.",
+            category: existingCategory
+        });
+
+    } catch (error) {
+        console.error("Update category error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while updating the category."
+        });
+    }
+};
+
+// Delete category
+const deleteCategory = async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+
+        const category = await categoryPriceModel.findById(categoryId);
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found."
+            });
+        }
+
+        await categoryPriceModel.findByIdAndDelete(categoryId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Category deleted successfully."
+        });
+
+    } catch (error) {
+        console.error("Delete category error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while deleting the category."
+        });
+    }
+};
+
 
 export {
     createCategoryPrice,
@@ -219,5 +326,7 @@ export {
     toggleCategoryStatus,
     getActiveCategories,
     getAllCategories,
-    getCategories
+    getCategories,
+    updateCategory,
+    deleteCategory
 };

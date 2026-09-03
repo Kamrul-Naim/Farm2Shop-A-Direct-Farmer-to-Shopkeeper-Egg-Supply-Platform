@@ -50,6 +50,7 @@ const AppContextProvider = ({ children }) => {
 
             if (response.data.success) {
                 setAdmin(response.data.admin);
+                
 
                 toast.success(response.data.message);
 

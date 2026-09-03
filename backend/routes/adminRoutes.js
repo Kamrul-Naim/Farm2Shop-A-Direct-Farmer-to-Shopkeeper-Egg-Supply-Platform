@@ -7,7 +7,7 @@ import {
     getDashboardStats
 } from "../controllers/adminController.js";
 
-import { createCategoryPrice,getAllCategories,updateCategoryPrice,toggleCategoryStatus } from "../controllers/categoryPriceController.js";
+import { createCategoryPrice,getAllCategories,updateCategoryPrice,toggleCategoryStatus,updateCategory,deleteCategory } from "../controllers/categoryPriceController.js";
 
 import adminAuthMiddleware from "../middlewares/adminAuthMiddleware.js";
 
@@ -65,6 +65,20 @@ adminRouter.patch(
     "/categories/:categoryId/status",
     adminAuthMiddleware,
     toggleCategoryStatus
+);
+
+// Update category name + price
+adminRouter.patch(
+    "/categories/:categoryId",
+    adminAuthMiddleware,
+    updateCategory
+);
+
+// Delete category
+adminRouter.delete(
+    "/categories/:categoryId",
+    adminAuthMiddleware,
+    deleteCategory
 );
 
 
