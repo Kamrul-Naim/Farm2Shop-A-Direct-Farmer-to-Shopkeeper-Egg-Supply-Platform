@@ -160,7 +160,8 @@ const getDashboardStats = async (req, res) => {
         const eggsSoldResult = await orderModel.aggregate([
             {
                 $match: {
-                    orderStatus: "delivered"
+                    orderStatus: "delivered",
+                    paymentStatus: "paid"
                 }
             },
             {
@@ -219,8 +220,56 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+
+// Get admin/platform earnings
+const getAdminEarnings = async (req, res) => {
+    try {
+        // Only delivered AND paid orders contribute to platform earnings
+        const completedOrders = await orderModel
+            .find({
+                orderStatus: "delivered",
+                paymentStatus: "paid"
+            })
+            .populate("shopkeeper", "name shopName")
+            .populate("farmer", "name farmName")
+            .populate("product", "productName")
+            .populate("category", "category")
+            .sort({ createdAt: -1 });
+
+        // Total eggs sold from qualifying orders
+        const totalEggsSold = completedOrders.reduce(
+            (total, order) => total + order.quantity,
+            0
+        );
+
+        // Platform earns ৳1 per egg
+        const platformEarnings = totalEggsSold * 1;
+
+        return res.status(200).json({
+            success: true,
+
+            summary: {
+                totalEggsSold,
+                platformEarnings,
+                completedOrders: completedOrders.length
+            },
+
+            orders: completedOrders
+        });
+
+    } catch (error) {
+        console.error("Get admin earnings error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch admin earnings."
+        });
+    }
+};
+
 export { loginAdmin,
     getCurrentAdmin,
     logoutAdmin,
-    getDashboardStats
+    getDashboardStats,
+    getAdminEarnings
  };

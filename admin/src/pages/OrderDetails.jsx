@@ -339,7 +339,7 @@ const updatePaymentStatus = async () => {
             </div>
 
             {/* Customer / Farmer */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div onClick={() => navigate(`/shopkeepers/${order.shopkeeper?._id}`)} className="grid grid-cols-1 md:grid-cols-2 gap-6 cursor-pointer">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <FiUser className="text-green-600" size={18} />

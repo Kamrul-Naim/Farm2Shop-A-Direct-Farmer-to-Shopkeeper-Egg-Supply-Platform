@@ -4,10 +4,19 @@ import {
     loginAdmin,
     getCurrentAdmin,
     logoutAdmin,
-    getDashboardStats
+    getDashboardStats,
+    getAdminEarnings
 } from "../controllers/adminController.js";
 
 import { createCategoryPrice,getAllCategories,updateCategoryPrice,toggleCategoryStatus,updateCategory,deleteCategory } from "../controllers/categoryPriceController.js";
+
+import {
+    getAllShopkeepersForAdmin,getShopkeeperDetailsForAdmin
+} from "../controllers/adminShopkeeperController.js";
+
+import {
+    getAllFarmersForAdmin,getFarmerDetails
+} from "../controllers/adminFarmerController.js";
 
 import adminAuthMiddleware from "../middlewares/adminAuthMiddleware.js";
 
@@ -81,5 +90,41 @@ adminRouter.delete(
     deleteCategory
 );
 
+// Get all shopkeepers
+adminRouter.get(
+    "/shopkeepers",
+    adminAuthMiddleware,
+    getAllShopkeepersForAdmin
+);
+
+// Get shopkeeper details
+adminRouter.get(
+    "/shopkeepers/:shopkeeperId",
+    adminAuthMiddleware,
+    getShopkeeperDetailsForAdmin
+);
+
+
+// Get all farmers
+adminRouter.get(
+    "/farmers",
+    adminAuthMiddleware,
+    getAllFarmersForAdmin
+);
+
+// Get farmer details
+adminRouter.get(
+    "/farmers/:farmerId",
+    adminAuthMiddleware,
+    getFarmerDetails
+);
+
+
+// Admin/platform earnings
+adminRouter.get(
+    "/earnings",
+    adminAuthMiddleware,
+    getAdminEarnings
+);
 
 export default adminRouter;

@@ -7,6 +7,8 @@ import Shopkeepers from "./pages/Shopkeepers";
 import Farmers from "./pages/Farmers";
 import Earnings from "./pages/Earnings";
 import OrderDetails from "./pages/OrderDetails";
+import ShopkeeperDetails from "./pages/ShopkeeperDetails";
+import FarmerDetails from "./pages/FarmerDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import GuestRoute from "./components/GuestRoute";
@@ -45,6 +47,11 @@ const App = () => {
 
           <Route path="/earnings" element={<Earnings />} />
           <Route path="/orders/:orderId" element={<OrderDetails />} />
+          <Route
+            path="/shopkeepers/:shopkeeperId"
+            element={<ShopkeeperDetails />}
+          />
+          <Route path="/farmers/:farmerId" element={<FarmerDetails />} />
         </Route>
       </Routes>
     );
