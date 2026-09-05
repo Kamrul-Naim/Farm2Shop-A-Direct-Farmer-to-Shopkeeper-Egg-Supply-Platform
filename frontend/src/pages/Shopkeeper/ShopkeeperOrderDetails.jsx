@@ -11,6 +11,7 @@ const ShopkeeperOrderDetails = () => {
 
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [paying, setPaying] = useState(false);
 
     const fetchOrder = async () => {
         try {
@@ -39,6 +40,37 @@ const ShopkeeperOrderDetails = () => {
             setLoading(false);
         }
     };
+
+    const handlePayOnline = async () => {
+    try {
+        setPaying(true);
+
+        const { data } = await axios.post(
+            `${backendUrl}/api/payment/online`,
+            {
+                orderId: order._id,
+            },
+            {
+                withCredentials: true,
+            }
+        );
+
+        if (data.success && data.url) {
+            window.location.href = data.url;
+        } else {
+            toast.error(data.message || "Failed to initiate payment.");
+        }
+    } catch (error) {
+        console.error("Online payment error:", error);
+
+        toast.error(
+            error.response?.data?.message ||
+            "Failed to initiate online payment."
+        );
+    } finally {
+        setPaying(false);
+    }
+};
 
     useEffect(() => {
         fetchOrder();
@@ -280,26 +312,44 @@ const ShopkeeperOrderDetails = () => {
                         </div>
 
                         {/* Payment */}
-                        <div className="mt-6 pt-5 border-t border-gray-100">
+<div className="mt-6 pt-5 border-t border-gray-100">
 
-                            <p className="text-xs text-gray-500">
-                                Payment Method
-                            </p>
+    <p className="text-xs text-gray-500">
+        Payment Method
+    </p>
 
-                            <p className="mt-1 font-semibold text-gray-800">
-                                {paymentLabels[order.paymentMethod] ||
-                                    order.paymentMethod}
-                            </p>
+    <p className="mt-1 font-semibold text-gray-800">
+        {paymentLabels[order.paymentMethod] ||
+            order.paymentMethod}
+    </p>
 
-                            <p className="mt-3 text-xs text-gray-500">
-                                Payment Status
-                            </p>
+    <p className="mt-3 text-xs text-gray-500">
+        Payment Status
+    </p>
 
-                            <p className="mt-1 font-semibold capitalize text-gray-800">
-                                {order.paymentStatus}
-                            </p>
+    <p className="mt-1 font-semibold capitalize text-gray-800">
+        {order.paymentStatus}
+    </p>
 
-                        </div>
+    {/* Online Payment Button */}
+    {order.paymentStatus.toLowerCase() === "paid" ? (
+        <button
+            disabled
+            className="mt-5 w-full py-3 rounded-xl bg-green-100 text-green-700 font-semibold cursor-not-allowed"
+        >
+            Paid
+        </button>
+    ) : (
+        <button
+        onClick={handlePayOnline}
+        disabled={paying}
+        className="mt-5 w-full py-3 rounded-xl bg-[#176B3A] text-white font-semibold hover:bg-[#12552E] transition disabled:opacity-60 disabled:cursor-not-allowed"
+    >
+        {paying ? "Redirecting to Payment..." : "Pay Online"}
+    </button>
+    )}
+
+</div>
 
                         {/* Delivery Address */}
                         <div className="mt-6 pt-5 border-t border-gray-100">

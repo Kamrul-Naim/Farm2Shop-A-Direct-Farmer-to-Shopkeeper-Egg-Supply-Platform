@@ -12,28 +12,18 @@ const createOrder = async (req, res) => {
         const {
             productId,
             quantity,
-            deliveryAddress,
-            paymentMethod
+            deliveryAddress
         } = req.body;
 
         // Check required fields
         if (
             !productId ||
             quantity === undefined ||
-            !deliveryAddress ||
-            !paymentMethod
+            !deliveryAddress
         ) {
             return res.status(400).json({
                 success: false,
                 message: "All required fields must be provided."
-            });
-        }
-
-        // Only COD and online payment are allowed
-        if (!["cod", "online"].includes(paymentMethod)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid payment method."
             });
         }
 
@@ -144,6 +134,7 @@ const createOrder = async (req, res) => {
         const totalAmount = quantity * unitPrice;
 
         // Create order
+        // Every newly created order starts as COD
         const order = await orderModel.create({
             shopkeeper: shopkeeper._id,
             farmer: product.farmer,
@@ -158,21 +149,19 @@ const createOrder = async (req, res) => {
 
             orderStatus: "placed",
 
-            paymentMethod,
+            paymentMethod: "cod",
             paymentStatus: "pending"
         });
 
-        // Reduce stock immediately only for COD
-        if (paymentMethod === "cod") {
-            product.quantity -= quantity;
+        // Reduce stock
+        product.quantity -= quantity;
 
-            // If no stock remains, mark product unavailable
-            if (product.quantity === 0) {
-                product.isAvailable = false;
-            }
-
-            await product.save();
+        // If no stock remains, mark product unavailable
+        if (product.quantity === 0) {
+            product.isAvailable = false;
         }
+
+        await product.save();
 
         // Notify farmer
         await createNotification({

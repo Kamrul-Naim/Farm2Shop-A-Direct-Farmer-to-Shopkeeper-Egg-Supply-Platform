@@ -15,7 +15,7 @@ const OrderPlacement = () => {
 
   const [quantity, setQuantity] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  // const [paymentMethod, setPaymentMethod] = useState("cod");
 
   // Fetch product
   const fetchProduct = async () => {
@@ -58,100 +58,78 @@ const OrderPlacement = () => {
 
   const totalAmount = orderQuantity * unitPrice;
 
-  // Place order
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
 
-    if (!product) {
-      return;
-    }
+// Place order
+const handlePlaceOrder = async (e) => {
+  e.preventDefault();
 
-    if (!quantity || orderQuantity < 1) {
-      toast.error("Please enter a valid quantity.");
-      return;
-    }
+  if (!product) {
+    return;
+  }
 
-    if (orderQuantity < product.minimumOrderQuantity) {
+  if (!quantity || orderQuantity < 1) {
+    toast.error("Please enter a valid quantity.");
+    return;
+  }
+
+  if (orderQuantity < product.minimumOrderQuantity) {
+    toast.error(
+      `Minimum order quantity is ${product.minimumOrderQuantity} pieces.`,
+    );
+    return;
+  }
+
+  if (orderQuantity > product.quantity) {
+    toast.error(`Only ${product.quantity} pieces are available.`);
+    return;
+  }
+
+  if (!deliveryAddress.trim()) {
+    toast.error("Please enter your delivery address.");
+    return;
+  }
+
+  try {
+    setPlacingOrder(true);
+
+    // Create order
+    // Every newly created order is COD by default
+    const response = await axios.post(
+      `${backendUrl}/api/orders`,
+      {
+        productId,
+        quantity: orderQuantity,
+        deliveryAddress: deliveryAddress.trim(),
+      },
+      {
+        withCredentials: true,
+      },
+    );
+
+    if (!response.data.success) {
       toast.error(
-        `Minimum order quantity is ${product.minimumOrderQuantity} pieces.`,
+        response.data.message || "Failed to place order.",
       );
       return;
     }
 
-    if (orderQuantity > product.quantity) {
-      toast.error(`Only ${product.quantity} pieces are available.`);
-      return;
-    }
+    const order = response.data.order;
 
-    if (!deliveryAddress.trim()) {
-      toast.error("Please enter your delivery address.");
-      return;
-    }
+    toast.success("Order placed successfully.");
 
-    try {
-      setPlacingOrder(true);
+    navigate(`/shopkeeper/orders/${order._id}`);
 
-      // Create order
-      const response = await axios.post(
-        `${backendUrl}/api/orders`,
-        {
-          productId,
-          quantity: orderQuantity,
-          deliveryAddress: deliveryAddress.trim(),
-          paymentMethod,
-        },
-        {
-          withCredentials: true,
-        },
-      );
+  } catch (error) {
+    console.error("Place order error:", error);
 
-      if (!response.data.success) {
-        toast.error(response.data.message || "Failed to place order.");
-        return;
-      }
-
-      const order = response.data.order;
-
-      // COD
-      if (paymentMethod === "cod") {
-        toast.success("Order placed successfully.");
-
-        navigate(`/shopkeeper/orders/${order._id}`);
-
-        return;
-      }
-
-      // Online payment
-      if (paymentMethod === "online") {
-        const paymentResponse = await axios.post(
-          `${backendUrl}/api/payment/sslcommerz/initiate`,
-          {
-            orderId: order._id,
-          },
-          {
-            withCredentials: true,
-          },
-        );
-
-        if (!paymentResponse.data.success) {
-          toast.error(
-            paymentResponse.data.message ||
-              "Failed to initiate online payment.",
-          );
-          return;
-        }
-
-        // Redirect to SSLCommerz payment page
-        window.location.href = paymentResponse.data.paymentUrl;
-      }
-    } catch (error) {
-      console.error("Place order error:", error);
-
-      toast.error(error.response?.data?.message || "Failed to place order.");
-    } finally {
-      setPlacingOrder(false);
-    }
-  };
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to place order.",
+    );
+  } finally {
+    setPlacingOrder(false);
+  }
+};
 
   if (loading) {
     return (
@@ -276,63 +254,6 @@ const OrderPlacement = () => {
             </div>
 
             {/* Payment Method */}
-            <div className="mt-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Payment Method
-              </label>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* COD */}
-                <label
-                  className={`cursor-pointer border rounded-xl p-4 transition ${
-                    paymentMethod === "cod"
-                      ? "border-[#176B3A] bg-[#EAF5EE]"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="cod"
-                    checked={paymentMethod === "cod"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="sr-only"
-                  />
-
-                  <p className="font-semibold text-gray-800">
-                    Cash on Delivery
-                  </p>
-
-                  <p className="mt-1 text-xs text-gray-500">
-                    Pay when your order is delivered.
-                  </p>
-                </label>
-
-                {/* Online */}
-                <label
-                  className={`cursor-pointer border rounded-xl p-4 transition ${
-                    paymentMethod === "online"
-                      ? "border-[#176B3A] bg-[#EAF5EE]"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="online"
-                    checked={paymentMethod === "online"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="sr-only"
-                  />
-
-                  <p className="font-semibold text-gray-800">Online Payment</p>
-
-                  <p className="mt-1 text-xs text-gray-500">
-                    Pay securely using SSLCommerz.
-                  </p>
-                </label>
-              </div>
-            </div>
           </div>
 
           {/* Order Summary */}

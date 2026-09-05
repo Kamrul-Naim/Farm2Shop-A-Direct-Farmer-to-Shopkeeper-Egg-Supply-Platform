@@ -30,9 +30,11 @@ import AddProduct from "./pages/Farmer/AddProduct";
 import OrderPlacement from "./pages/Shopkeeper/OrderPlacement";
 import ShopkeeperOrderDetails from "./pages/Shopkeeper/ShopkeeperOrderDetails";
 import FarmerOrderDetails from "./pages/Farmer/FarmerOrderDetails";
-import PaymentSuccess from "./pages/Shopkeeper/PaymentSuccess";
-import PaymentFail from "./pages/Shopkeeper/PaymentFail";
-import PaymentCancel from "./pages/Shopkeeper/PaymentCancel";
+// import PaymentSuccess from "./pages/Shopkeeper/PaymentSuccess";
+// import PaymentFail from "./pages/Shopkeeper/PaymentFail";
+// import PaymentCancel from "./pages/Shopkeeper/PaymentCancel";
+
+import PaymentFailed from "./pages/Shopkeeper/PaymentFailed";
 
 const App = () => {
   const { loading } = useContext(AppContext);
@@ -106,11 +108,9 @@ const App = () => {
               path="/shopkeeper/orders/:orderId"
               element={<ShopkeeperOrderDetails />}
             />
-            <Route path="/payment/success" element={<PaymentSuccess />} />
 
-            <Route path="/payment/fail" element={<PaymentFail />} />
+            <Route path="/shopkeeper/paymentFail" element={<PaymentFailed />} />
 
-            <Route path="/payment/cancel" element={<PaymentCancel />} />
           </Route>
         </Routes>
       </div>
