@@ -18,17 +18,17 @@ const steps = [
     },
     {
         number: "02",
-        icon: FiCheckCircle,
-        title: "Quality Is Checked",
-        description:
-            "Our team collects the eggs and verifies their quality, grade and quantity before listing them."
-    },
-    {
-        number: "03",
         icon: FiShoppingBag,
         title: "Shopkeepers Order",
         description:
             "Verified shopkeepers browse available eggs and place orders directly through the marketplace."
+    },
+    {
+        number: "03",
+        icon: FiCheckCircle,
+        title: "Quality Is Checked",
+        description:
+            "Our team collects the eggs and verifies their quality, grade and quantity before listing them."
     },
     {
         number: "04",

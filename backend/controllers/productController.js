@@ -190,6 +190,9 @@ const getMyProducts = async (req, res) => {
     try {
         const farmerId = req.user.id;
 
+        // Update expired products first
+        await updateExpiredProducts();
+
         const products = await productModel
             .find({
                 farmer: farmerId
@@ -199,7 +202,7 @@ const getMyProducts = async (req, res) => {
                 "category price"
             )
             .sort({ createdAt: -1 });
-
+        
         return res.status(200).json({
             success: true,
             products
@@ -616,4 +619,20 @@ const getProductByIdForAdmin = async (req, res) => {
     }
 };
 
-export { createProduct, getProducts, getMyProducts, getProductById, updateProduct, removeProduct, removeProductByAdmin, getAllProductsForAdmin, getProductByIdForAdmin };
+const updateExpiredProducts = async () => {
+    try {
+        await productModel.updateMany(
+            {
+                expiresAt: { $lte: new Date() },
+                isAvailable: true
+            },
+            {
+                $set: { isAvailable: false }
+            }
+        );
+    } catch (error) {
+        console.error("Update expired products error:", error);
+    }
+};
+
+export { createProduct, getProducts, getMyProducts, getProductById, updateProduct, removeProduct, removeProductByAdmin, getAllProductsForAdmin, getProductByIdForAdmin, updateExpiredProducts };

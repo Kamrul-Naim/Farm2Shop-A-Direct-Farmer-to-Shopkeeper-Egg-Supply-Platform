@@ -68,7 +68,7 @@ const Hero = () => {
                                     duration: 0.6,
                                     delay: 0.2
                                 }}
-                                className="text-4xl sm:text-5xl xl:text-6xl font-bold leading-[1.08] tracking-tight text-[#123B27]"
+                                className="text-3xl sm:text-4xl xl:text-5xl font-bold leading-[1.08] tracking-tight text-[#123B27]"
                             >
                                 Fairer Egg Trade.
 
@@ -113,7 +113,7 @@ const Hero = () => {
 
                                 <button
                                     onClick={() => navigate("/register")}
-                                    className="group flex items-center gap-2 px-6 py-3.5 bg-[#176B3A] text-white rounded-xl font-medium shadow-sm hover:bg-[#12572F] hover:shadow-lg transition-all duration-300"
+                                    className="group flex items-center gap-2 px-6 py-3.5 bg-[#176B3A] text-white rounded-xl font-medium shadow-sm hover:bg-[#12572F] hover:shadow-lg transition-all duration-300 cursor-pointer"
                                 >
                                     Get Started
 
@@ -126,7 +126,7 @@ const Hero = () => {
 
                                 <button
                                     onClick={() => navigate("/how-it-works")}
-                                    className="flex items-center gap-2 px-6 py-3.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:border-[#176B3A] hover:text-[#176B3A] transition-all duration-300"
+                                    className="flex items-center gap-2 px-6 py-3.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:border-[#176B3A] hover:text-[#176B3A] transition-all duration-300 cursor-pointer"
                                 >
                                     How It Works
                                 </button>

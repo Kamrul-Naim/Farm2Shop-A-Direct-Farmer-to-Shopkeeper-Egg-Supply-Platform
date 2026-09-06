@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { assets } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 import {
     FiArrowRight,
     FiCheckCircle,
@@ -37,10 +38,12 @@ const benefits = [
 ];
 
 const ForFarmers = () => {
+    const navigate = useNavigate();
+
     return (
         <section
             id="for-farmers"
-            className="relative overflow-hidden bg-[#F7FAF8] py-20 sm:py-24 lg:py-28 scroll-mt-24"
+            className="relative overflow-hidden bg-[#F7FAF8] pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 scroll-mt-24"
         >
 
             {/* Background decoration */}
@@ -130,11 +133,6 @@ const ForFarmers = () => {
 
                         </motion.div>
 
-
-                        {/* Decorative circle */}
-
-                        <div className="absolute -top-5 -right-5 w-20 h-20 rounded-full border-[10px] border-[#F4A62A]/20 pointer-events-none" />
-
                     </motion.div>
 
 
@@ -164,7 +162,7 @@ const ForFarmers = () => {
 
                         <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#EAF5EE] text-[#176B3A] text-sm font-medium">
 
-                            <span className="w-2 h-2 rounded-full bg-[#F4A62A]" />
+                            <span className="w-2 h-2 rounded-full bg-[#F4A62A]"/>
 
                             For Farmers
 
@@ -263,9 +261,9 @@ const ForFarmers = () => {
                                 scale: 0.98
                             }}
                             onClick={() => {
-                                // Registration route will be connected later
+                                navigate("/register");
                             }}
-                            className="mt-9 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#176B3A] text-white text-sm font-medium hover:bg-[#12572F] hover:shadow-lg transition-all duration-300"
+                            className="mt-9 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#176B3A] text-white text-sm font-medium hover:bg-[#12572F] hover:shadow-lg transition-all duration-300 cursor-pointer"
                         >
 
                             Join as a Farmer

@@ -32,6 +32,16 @@ const AddProduct = () => {
     );
   }
 
+  if (!user) {
+    return (
+        <div className="min-h-[60vh] flex items-center justify-center">
+            <p className="text-gray-500">
+                Loading user information...
+            </p>
+        </div>
+    );
+}
+
   if (userRole !== "farmer") {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-[#f5f7f4] px-4">
@@ -59,7 +69,7 @@ const AddProduct = () => {
     );
   }
 
-  if (user?.verificationStatus !== "approved") {
+  if (user.verificationStatus !== "approved") {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-[#f5f7f4] px-4">
         <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200 shadow-sm p-8 text-center">
@@ -77,7 +87,7 @@ const AddProduct = () => {
           </p>
 
           <div className="mt-4 inline-flex px-3 py-1.5 rounded-full bg-yellow-50 text-yellow-700 text-xs font-semibold capitalize">
-            Status: {user?.verificationStatus || "Unknown"}
+            Status: {user.verificationStatus || "Unknown"}
           </div>
 
           <button
@@ -91,33 +101,33 @@ const AddProduct = () => {
     );
   }
 
-  if (!user?.isActive) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-[#f5f7f4] px-4">
-        <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200 shadow-sm p-8 text-center">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-red-50 flex items-center justify-center text-2xl">
-            ⚠️
-          </div>
+  // if (!user.isActive) {
+  //   return (
+  //     <div className="min-h-[60vh] flex items-center justify-center bg-[#f5f7f4] px-4">
+  //       <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200 shadow-sm p-8 text-center">
+  //         <div className="w-16 h-16 mx-auto rounded-2xl bg-red-50 flex items-center justify-center text-2xl">
+  //           ⚠️
+  //         </div>
 
-          <h2 className="mt-5 text-2xl font-bold text-gray-900">
-            Account Inactive
-          </h2>
+  //         <h2 className="mt-5 text-2xl font-bold text-gray-900">
+  //           Account Inactive
+  //         </h2>
 
-          <p className="mt-3 text-gray-500 leading-6">
-            Your farmer account is currently inactive. You cannot add products
-            at this time.
-          </p>
+  //         <p className="mt-3 text-gray-500 leading-6">
+  //           Your farmer account is currently inactive. You cannot add products
+  //           at this time.
+  //         </p>
 
-          <button
-            onClick={() => navigate("/farmer/stock")}
-            className="mt-6 px-6 py-3 rounded-xl bg-[#176B3A] text-white font-semibold hover:bg-[#12582f] transition"
-          >
-            Back to My Stock
-          </button>
-        </div>
-      </div>
-    );
-  }
+  //         <button
+  //           onClick={() => navigate("/farmer/stock")}
+  //           className="mt-6 px-6 py-3 rounded-xl bg-[#176B3A] text-white font-semibold hover:bg-[#12582f] transition"
+  //         >
+  //           Back to My Stock
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Fetch categories
   const fetchCategories = async () => {

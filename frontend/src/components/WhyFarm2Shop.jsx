@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { assets } from "../assets/assets";
 import {
     FiCheckCircle,
     FiDollarSign,
@@ -38,7 +39,7 @@ const WhyFarm2Shop = () => {
     return (
         <section
             id="why-farm2shop"
-            className="relative overflow-hidden bg-[#F7FAF8] py-20 sm:py-24 lg:py-28 scroll-mt-24"
+            className="relative overflow-hidden bg-[#F7FAF8] pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 scroll-mt-24"
         >
 
             {/* Background decorations */}
@@ -139,7 +140,7 @@ const WhyFarm2Shop = () => {
                             >
 
                                 <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#EAF5EE] border border-[#D7EBDD] flex items-center justify-center text-3xl sm:text-4xl">
-                                    🌾
+                                    <img className="w-10" src={assets.egg} alt="egg logo" />
                                 </div>
 
                                 <h3 className="mt-3 text-sm sm:text-base font-semibold text-[#123B27]">
@@ -278,7 +279,7 @@ const WhyFarm2Shop = () => {
                                 className="relative z-10 flex flex-col items-center text-center"
                             >
 
-                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#FFF4DF] border border-[#F7E4BD] flex items-center justify-center text-3xl sm:text-4xl">
+                                <div className="w-20 h-21 sm:w-24 sm:h-24 rounded-2xl bg-[#FFF4DF] border border-[#F7E4BD] flex items-center justify-center text-3xl sm:text-4xl">
                                     🏪
                                 </div>
 

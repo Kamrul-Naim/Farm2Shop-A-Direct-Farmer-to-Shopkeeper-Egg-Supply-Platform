@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { assets } from "../assets/assets";
 import {
     FiCheckCircle,
     FiHeart,
@@ -38,7 +39,7 @@ const About = () => {
     return (
         <section
             id="about"
-            className="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-28 scroll-mt-24"
+            className="relative overflow-hidden bg-white pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 scroll-mt-24"
         >
 
             {/* Background decoration */}
@@ -129,8 +130,8 @@ const About = () => {
                                     className="absolute left-[8%] sm:left-[12%] top-[22%] bg-white rounded-2xl shadow-md border border-gray-100 px-4 py-4 text-center"
                                 >
 
-                                    <div className="text-3xl">
-                                        🌾
+                                    <div className="w-10">
+                                        <img src={assets.egg} alt="egg" />
                                     </div>
 
                                     <p className="mt-2 text-xs font-semibold text-[#123B27]">
@@ -233,7 +234,7 @@ const About = () => {
                                 duration: 0.6,
                                 delay: 0.5
                             }}
-                            className="absolute -bottom-5 right-5 sm:right-8 bg-white rounded-2xl shadow-lg border border-gray-100 px-4 py-3 flex items-center gap-3"
+                            className="absolute -bottom-10 right-5 sm:right-8 bg-white rounded-2xl shadow-lg border border-gray-100 px-4 py-3 flex items-center gap-3"
                         >
 
                             <div className="w-9 h-9 rounded-xl bg-[#EAF5EE] flex items-center justify-center text-[#176B3A]">
