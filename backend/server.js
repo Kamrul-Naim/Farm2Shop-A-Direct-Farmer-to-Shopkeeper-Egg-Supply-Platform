@@ -28,7 +28,9 @@ app.use(cookieParser())
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "http://localhost:5174"
+        "http://localhost:5174",
+        "https://farm2-shop-a-direct-farmer-to-shopk.vercel.app",
+        "farm2-shop-a-direct-farmer-to-shopk-neon.vercel.app"
     ],
     credentials: true
 }));
