@@ -30,7 +30,7 @@ app.use(cors({
         "http://localhost:5173",
         "http://localhost:5174",
         "https://farm2-shop-a-direct-farmer-to-shopk.vercel.app",
-        "farm2-shop-a-direct-farmer-to-shopk-neon.vercel.app"
+        "https://farm2-shop-a-direct-farmer-to-shopk-neon.vercel.app"
     ],
     credentials: true
 }));
