@@ -333,7 +333,7 @@ const ShopkeeperDashboard = () => {
                       key={order._id}
                       onClick={() =>
                         navigate(
-                          `/shopkeeper/order/${order._id}`
+                          `/shopkeeper/orders/${order._id}`
                         )
                       }
                       className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer transition"
