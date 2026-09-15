@@ -13,6 +13,31 @@ Farm2Shop is built using the **MERN stack**, along with Cloudinary for image sto
 
 ---
 
+## 💪 Motivation
+
+I have recently discovered that there is no such platform available in Bangladesh which is dedicated to connect the egg farmers and shopkeepers directly. This may seem normal because most of the egg farms of our country rely on traditional egg supply chan.
+The traditional egg supply chain is something like:
+ 
+Farmer → Local Dealer → Large City Dealer → Sub-Dealer → Van Supplier → Shopkeeper → Consumer
+
+This traditional egg supply chain has definately some issues. Dependency on this multiple levels increase the price of the egg significantly. And besides, this can create syndicate on this egg supply chain.
+The main idea behind this project was simple: make the process of selling, buying, and managing egg products more organized and convenient through a digital platform.
+
+The impact of our platform can help to benifit both the farmers, shopkeepers and the general consumers too.
+
+For example, In the current egg supply chain, If the market rate of a particular category of egg is 12.5 BDT. per egg, then,
+- Farmers usually sell it on about 9.00 BDT. per egg
+- The multiple intermediary levels consume about 3.00 tk. per egg, making it 12.00 BDT. per egg
+- The shopkeepers buy it on 12.00 BDT
+- And finally the consumers buy it on 12.5 BDT
+
+But In case of our platform, the situation will be something like:
+- Farmers will sell it on 10.30 BDT
+- Platform cost 1.00 BDT, making it 11.50 BDT
+- The shopkeepers will buy it on 11.50 and sell it on 12.50
+
+---
+
 ## 🛠️ Tech Stack
 
 - **Frontend:** React.js, Tailwind CSS
